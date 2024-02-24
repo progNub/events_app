@@ -34,3 +34,13 @@ class UpdateEventApiView(UpdateAPIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_404_NOT_FOUND)
+
+
+class ListMyEventsApiView(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ser.MyEventsListSerializer
+
+    def get_queryset(self):
+        result = (Events.objects.filter(users__id=self.request.user.id).
+                  select_related('category').prefetch_related('users'))
+        return result

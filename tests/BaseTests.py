@@ -2,6 +2,7 @@ from django.contrib.auth.hashers import make_password
 from rest_framework.test import APITestCase
 
 from accounts.models import User
+from tests.fakeData import TestDataUsers
 
 
 class CustomAPITestCase(APITestCase):
@@ -10,6 +11,7 @@ class CustomAPITestCase(APITestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         dict_admin = {
             'username': 'AdminTestListUserApiView',
             'email': 'AdminTest@gmail.com',
@@ -21,3 +23,6 @@ class CustomAPITestCase(APITestCase):
         }
         cls.admin = User.objects.create_superuser(**dict_admin)
         cls.user = User.objects.create_user(**dict_user)
+        User.objects.bulk_create(TestDataUsers.get_list_fake_users())
+
+

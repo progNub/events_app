@@ -46,3 +46,13 @@ class SubscribeEventSerializer(serializers.ModelSerializer):
         if self.instance.meeting_time < timezone.now():
             raise serializers.ValidationError("Мероприятие уже прошло.")
         return data
+
+
+class MyEventsListSerializer(serializers.ModelSerializer):
+    users = UsersField(many=True, read_only=True)
+    category = CategoryField()
+
+    class Meta:
+        model = Events
+        fields = ['title', 'description', 'meeting_time', 'category', 'users']
+        read_only_fields = ['title', 'description', 'meeting_time', 'category', 'users']

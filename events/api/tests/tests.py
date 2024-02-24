@@ -1,11 +1,11 @@
 from collections import OrderedDict
+import random
 
 from django.utils import timezone
-
 from rest_framework.reverse import reverse
 
 from tests.BaseTests import CustomAPITestCase
-from .testFaker import TestDataEvents as test_data
+from .fakeData import TestDataEvents as testEvents
 from accounts.models import User
 from events.models import Events
 from events.api.urls import app_name
@@ -17,6 +17,7 @@ class BaseTestEvents(CustomAPITestCase):
 
     @classmethod
     def setUpTestData(cls):
+        super().setUpTestData()
         future_event = {
             'title': 'TestFutureEvent',
             'description': 'DescriptionTestFutureEvent',
@@ -30,8 +31,7 @@ class BaseTestEvents(CustomAPITestCase):
         cls.future_event = Events.objects.create(**future_event)
         cls.past_event = Events.objects.create(**past_event)
         # заполняем тестовыми событиями бд
-        Events.objects.bulk_create(test_data.get_list_events())
-        super().setUpTestData()
+        Events.objects.bulk_create(testEvents.get_list_events())
 
 
 class TestUpdateEventApiView(BaseTestEvents):
@@ -67,10 +67,33 @@ class TestUpdateEventApiView(BaseTestEvents):
 class TestListEventsApiView(BaseTestEvents):
 
     def test_get_list_future_events(self):
-        response = self.client.get(reverse('events:api-list-events'))
+        response = self.client.get(reverse(f'{app_name}:api-list-events'))
         # получаем первый объект Events, так как стоит сортировка по возрастанию даты мы получим самый "старый" объект
         event: OrderedDict = response.data[0]
         # из строки получаем об]ект datatime для сравнения
         datatime_first_event = timezone.datetime.fromisoformat(event.get('meeting_time'))
         self.assertGreater(datatime_first_event, timezone.now())
         self.assertEqual(200, response.status_code)
+
+
+class TestMyListEventsApiView(BaseTestEvents):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        list_users = User.objects.all()
+        list_events = Events.objects.all()
+        for event in list_events:
+            num_users_to_add = random.randint(1, 5)
+            random_users = random.sample(list(list_users), num_users_to_add)
+            event.users.add(*random_users)
+
+    def test_get_my_list_events_user(self):
+        self.client.force_login(self.user)
+        response = self.client.get(reverse(f'{app_name}:api-list-my-events'))
+        count_users_events = Events.objects.filter(users__id=self.user.id).count()
+        self.assertEqual(count_users_events, len(response.data))
+        self.assertEqual(200, response.status_code)
+
+    def test_get_my_list_events_anonym(self):
+        response = self.client.get(reverse(f'{app_name}:api-list-my-events'))
+        self.assertEqual(401, response.status_code)
