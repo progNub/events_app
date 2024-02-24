@@ -1,9 +1,8 @@
-from django.contrib import admin
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from accounts.api import views
 
-app_name = 'api'
+app_name = 'accounts'
 
 urlpatterns = [
     path('users/', views.ListUserApiView.as_view(), name='api-list-users'),
