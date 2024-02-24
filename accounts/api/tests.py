@@ -25,7 +25,6 @@ class TestListUserApiView(CustomAPITestCase):
     def test_anonymous_get_list_users(self):
         """Тестирование того, что анонимный пользователь не получит список пользователей"""
         response = self.client.get(reverse(f'{app_name}:api-list-users'))
-        print(response.data)
         self.assertEqual(403, response.status_code)
 
     def test_create_new_user(self):
