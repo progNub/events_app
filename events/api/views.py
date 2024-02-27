@@ -1,9 +1,9 @@
-import datetime
 from django.utils import timezone
 from rest_framework import status
-from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView
+from rest_framework.generics import ListAPIView, UpdateAPIView
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
+from .cache import get_or_cache_queryset
 
 from events.api import serializers as ser
 from events.models import Events
@@ -12,7 +12,13 @@ from events.models import Events
 class ListEventsApiView(ListAPIView):
     serializer_class = ser.EventsListSerializer
     permission_classes = [AllowAny]
-    queryset = Events.objects.filter(meeting_time__gt=timezone.now()).select_related('category')
+
+    def get_queryset(self):
+        queryset = (Events.objects.filter(meeting_time__gt=timezone.now())
+                    .select_related('category')
+                    .prefetch_related('users'))
+        cached = get_or_cache_queryset(cache_key='all_events_list', queryset=queryset, timeout=60 * 5)
+        return cached
 
 
 class UpdateEventApiView(UpdateAPIView):
@@ -20,6 +26,7 @@ class UpdateEventApiView(UpdateAPIView):
     queryset = Events.objects.all()
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
+
 
     def post(self, request, *args, **kwargs):
         instance: Events = self.get_object()
@@ -41,6 +48,7 @@ class ListMyEventsApiView(ListAPIView):
     serializer_class = ser.MyEventsListSerializer
 
     def get_queryset(self):
-        result = (Events.objects.filter(users__id=self.request.user.id).
-                  select_related('category').prefetch_related('users'))
+        result = (Events.objects.filter(users__id=self.request.user.id)
+                  .select_related('category')
+                  .prefetch_related('users'))
         return result
