@@ -6,19 +6,16 @@ It exposes the WSGI callable as a module-level variable named ``application``.
 For more information on this file, see
 https://docs.djangoproject.com/en/5.0/howto/deployment/wsgi/
 """
-from __future__ import unicode_literals
-
 import os
 import sys
-
 from django.core.wsgi import get_wsgi_application
 
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
-sys.path.insert(0, os.path.abspath(os.path.join(PROJECT_ROOT, "..")))
+# Добавляем каталог с проектом в sys.path
+sys.path.append('/home/yastreb/events')
 
-settings_module = "%s.settings" % PROJECT_ROOT.split(os.sep)[-1]
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", settings_module)
+# Указываем Django, какие настройки использовать
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "events_app.settings")
 
-# os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'events_app.settings')
-
+# Создаем WSGI-приложение Django
 application = get_wsgi_application()
+
