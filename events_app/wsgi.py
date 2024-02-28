@@ -11,7 +11,7 @@ from django.core.wsgi import get_wsgi_application
 
 
 # Указываем Django, какие настройки использовать
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "events_app.settings")
 
 # Создаем WSGI-приложение Django
 application = get_wsgi_application()
