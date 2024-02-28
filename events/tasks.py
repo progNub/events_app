@@ -21,11 +21,15 @@ def send_reminder_email() -> None:
 
     events_to_remind = (Events.objects.filter(meeting_time__in=[six_hours_later, one_day_later])
                         .prefetch_related('users__email'))
+    print('TASK:', 'количество новостей за день или 6 часов = ', str(events_to_remind.count()))
 
     for event in events_to_remind:
+
         users_emails = event.users.values_list('email', flat=True)
         subject = f'Уведомляем вас, что вы согласились посетить {event.title}'
         body = f'Мероприятие будет в {str(event.meeting_time)}\n{event.description}'
+
+        print(f"Количество пользователей: {len(list(users_emails))}")
 
         for email in users_emails:
             send_email.delay(subject=subject, body=body, email=email)
