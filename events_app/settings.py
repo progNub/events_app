@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 import os
 from pathlib import Path
 
+from celery.schedules import crontab
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -147,11 +149,11 @@ EMAIL_USE_SSL = False
 
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'Europe/Minsk'
+TIME_ZONE = 'UTC'
 
 USE_I18N = True
 
-USE_TZ = False
+USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
@@ -171,3 +173,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # ==========================CELERY===========================================
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKENDS = os.environ.get('CELERY_RESULT_BACKENDS')
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULE = {
+    'send_reminder_email': {
+        'task': 'events.tasks.send_reminder_email',
+        'schedule': 30,
+    },
+
+}
