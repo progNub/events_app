@@ -17,5 +17,6 @@ def send_message_after_create_event(sender, instance: Events, **kwargs):
     subject = f'Уведомляем вас, о новом мероприятии: {instance.title}'
     body = f'Мероприятие будет в {str(instance.meeting_time)}\n{instance.description}'
     logger.info(f'количество пользователей подписанных на рассылку:  {len(list(users))}')
+    print(f'количество пользователей подписанных на рассылку:  {len(list(users))}')
     for user in users:
         send_email.delay(subject=subject, body=body, email=user.email)

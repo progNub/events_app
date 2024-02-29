@@ -12,14 +12,15 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-@shared_task(ignore_result=True)
-def send_email(subject, body, email) -> None:
+@shared_task
+def send_email(subject, body, email):
     """Отправка сообщения на почту"""
     BaseEmailSender(subject=subject, body=body, email=email).send_mail()
+    return f'{subject}\n{body}\n{email}'
 
 
-@shared_task(ignore_result=True)
-def send_reminder_email() -> None:
+@shared_task
+def send_reminder_email():
     six_hours_later = timezone.now() + timedelta(hours=6)
     one_day_later = timezone.now() + timedelta(hours=24)
 
@@ -36,3 +37,4 @@ def send_reminder_email() -> None:
 
         for email in users_emails:
             send_email.delay(subject=subject, body=body, email=email)
+    return f'количество пользователей: {len(list(events_to_remind))}'
