@@ -13,6 +13,12 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
+def test_task():
+    print('test_task: run')
+    return 'ok'
+
+
+@shared_task
 def send_email(subject, body, email):
     """Отправка сообщения на почту"""
     BaseEmailSender(subject=subject, body=body, email=email).send_mail()
