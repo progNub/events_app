@@ -54,5 +54,5 @@ class ListMyEventsApiView(ListAPIView):
 
     def get(self, request, *args, **kwargs):
         from events.tasks import test_task
-        test_task.delay()
+        test_task.delay('run tun tun test_task.delay()')
         return super().get(request, *args, **kwargs)

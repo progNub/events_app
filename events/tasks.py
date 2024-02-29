@@ -13,9 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 @shared_task
-def test_task():
+def test_task(mess: str):
     print('test_task: run')
-    return 'ok'
+    return f'{mess}'
 
 
 @shared_task
