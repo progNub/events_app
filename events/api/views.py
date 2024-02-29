@@ -27,7 +27,6 @@ class UpdateEventApiView(UpdateAPIView):
     permission_classes = [IsAuthenticated, ]
     lookup_field = 'id'
 
-
     def post(self, request, *args, **kwargs):
         instance: Events = self.get_object()
         serializer = self.get_serializer(instance, data=request.data)
@@ -52,3 +51,8 @@ class ListMyEventsApiView(ListAPIView):
                   .select_related('category')
                   .prefetch_related('users'))
         return result
+
+    def get(self, request, *args, **kwargs):
+        from events.tasks import test_task
+        test_task.delay('run tun tun test_task.delay()')
+        return super().get(request, *args, **kwargs)
