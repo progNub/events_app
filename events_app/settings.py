@@ -189,10 +189,10 @@ CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
 CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 CELERY_TIMEZONE = TIME_ZONE
 
-CELERY_BEAT_SCHEDULE = {
-    'send_reminder_email': {
-        'task': 'events.tasks.send_reminder_email',
-        'schedule': 60,
-    },
-
-}
+# CELERY_BEAT_SCHEDULE = {
+#     'send_reminder_email': {
+#         'task': 'events.tasks.send_reminder_email',
+#         'schedule': 60,
+#     },
+#
+# }
