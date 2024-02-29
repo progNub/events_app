@@ -186,7 +186,7 @@ LOGGING = {
 
 # ==========================CELERY===========================================
 CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL')
-CELERY_RESULT_BACKENDS = os.environ.get('CELERY_RESULT_BACKENDS')
+CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND')
 CELERY_TIMEZONE = TIME_ZONE
 
 CELERY_BEAT_SCHEDULE = {
