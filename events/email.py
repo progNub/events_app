@@ -9,9 +9,17 @@ class BaseEmailSender:
         self._email = email
 
     def send_mail(self):
-        mail = EmailMultiAlternatives(
-            subject=self._subject,
-            body=self._body,
-            to=[self._email]
-        )
-        mail.send()
+        try:
+            mail = EmailMultiAlternatives(
+                subject=self._subject,
+                body=self._body,
+                to=[self._email]
+            )
+            # Отправка письма
+            mail.send()
+            return True  # Успешно отправлено
+        except Exception as e:
+            # Обработка ошибок при отправке письма
+            print(f"Failed to send email: {e}")
+            return False  # Ошибка при отправке
+
