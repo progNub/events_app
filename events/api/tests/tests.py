@@ -37,6 +37,7 @@ class BaseTestEvents(CustomAPITestCase):
 class TestUpdateEventApiView(BaseTestEvents):
 
     def test_user_subscribe_and_unsubscribe_to_future_event(self):
+        """Тестирование подписки на событие и отписки"""
         self.client.force_login(self.user)
         response = self.client.post(reverse(f'{app_name}:api-subscribe-event', kwargs={'id': self.future_event.id}))
         self.assertTrue(User.objects.filter(events__users__id=self.user.id).exists())
@@ -45,18 +46,21 @@ class TestUpdateEventApiView(BaseTestEvents):
         self.assertFalse(User.objects.filter(events__users__id=self.user.id).exists())
         self.assertEqual(200, response.status_code)
 
-    def test_user_subscribe_and_unsubscribe_to_past_event(self):
+    def test_user_subscribe_to_past_event(self):
+        """Тестирование подписки на прошедшее событие авторизованным пользователем"""
         self.client.force_login(self.user)
         response = self.client.post(reverse(f'{app_name}:api-subscribe-event', kwargs={'id': self.past_event.id}))
         self.assertFalse(User.objects.filter(events__users__id=self.user.id).exists())
         self.assertEqual(404, response.status_code)
 
     def test_anonym_subscribe_and_unsubscribe_to_event(self):
+        """Тестирование подписки на прошедшее событие анонимным пользователем"""
         response = self.client.post(reverse(f'{app_name}:api-subscribe-event', kwargs={'id': self.future_event.id}))
         self.assertFalse(User.objects.filter(events__users__id=self.user.id).exists())
         self.assertEqual(401, response.status_code)
 
     def test_user_subscribe_and_unsubscribe_to_non_existent_event(self):
+        """Тестирование подписки на несуществующее событие авторизованным пользователем"""
         self.client.force_login(self.user)
         count = Events.objects.count()
         id_non_existent_event = count + 1
@@ -67,6 +71,7 @@ class TestUpdateEventApiView(BaseTestEvents):
 class TestListEventsApiView(BaseTestEvents):
 
     def test_get_list_future_events(self):
+        """"Получаем список только тех событий, которым ещё предстоит произойти"""
         response = self.client.get(reverse(f'{app_name}:api-list-events'))
         # получаем первый объект Events, так как стоит сортировка по возрастанию даты мы получим самый "старый" объект
         event: OrderedDict = response.data[0]
@@ -88,6 +93,7 @@ class TestMyListEventsApiView(BaseTestEvents):
             event.users.add(*random_users)
 
     def test_get_my_list_events_user(self):
+        """Проверка на то что получены события на которые я был подписан"""
         self.client.force_login(self.user)
         response = self.client.get(reverse(f'{app_name}:api-list-my-events'))
         count_users_events = Events.objects.filter(users__id=self.user.id).count()
@@ -95,5 +101,6 @@ class TestMyListEventsApiView(BaseTestEvents):
         self.assertEqual(200, response.status_code)
 
     def test_get_my_list_events_anonym(self):
+        """проверка на получение событий анонимным пользователем"""
         response = self.client.get(reverse(f'{app_name}:api-list-my-events'))
         self.assertEqual(401, response.status_code)
