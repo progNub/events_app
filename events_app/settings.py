@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'events',
     'accounts',
+    'django-celery-beat',
 
 ]
 
@@ -178,7 +179,7 @@ CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE = {
     'send_reminder_email': {
         'task': 'events.tasks.send_reminder_email',
-        'schedule': 30,
+        'schedule': 60,
     },
 
 }

@@ -11,6 +11,7 @@ from events.models import Events
 @shared_task(ignore_result=True)
 def send_email(subject, body, email) -> None:
     """Отправка сообщения на почту"""
+    print('TASK:', ' вызвалась функция отправки сообщения ')
     BaseEmailSender(subject=subject, body=body, email=email).send_mail()
 
 
@@ -33,3 +34,6 @@ def send_reminder_email() -> None:
 
         for email in users_emails:
             send_email.delay(subject=subject, body=body, email=email)
+
+
+
